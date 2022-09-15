@@ -5,7 +5,11 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import javax.persistence.*;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
@@ -55,7 +59,7 @@ public class UserData {
         this.password = userData.getPassword();
         this.token = userData.getToken();
         this.isAdmin = userData.isAdmin();
-        this.isLogin= userData.isLogin;
+        this.isLogin = userData.isLogin;
     }
-    
+
 }
