@@ -77,11 +77,11 @@ public class UserController {
      * this is POST call
      * http://localhost:8080/userdetails/update
      */
-    @PutMapping("/update")
-    public ResponseEntity<ResposeDTO> updateUserByEmail(@RequestParam String email, @RequestBody UserDTO userDTO) {
-        ResposeDTO responseDTO = new ResposeDTO("User Updated Successfully", userService.updateUserByEmail(email, userDTO));
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
-    }
+//    @PutMapping("/update")
+//    public ResponseEntity<ResposeDTO> updateUserByEmail(@RequestParam String email, @RequestBody UserDTO userDTO) {
+//        ResposeDTO responseDTO = new ResposeDTO("User Updated Successfully", userService.updateUserByEmail(email, userDTO));
+//        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+//    }
 
     /**
      * Login user id to database

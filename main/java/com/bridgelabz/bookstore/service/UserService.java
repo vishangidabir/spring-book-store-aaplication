@@ -69,14 +69,14 @@ public class UserService implements IUserService {
     }
 
     //Ability to serve controller's update user records by email id api call
-    public UserData updateUserByEmail(String email, UserDTO userDTO) {
-        if (userRepository.findByEmailId(email) != null) {
-            int userID = userRepository.findByEmailId(email).getUserID();
-            UserData userData = new UserData(userDTO);
-            userData.setUserID(userID);
-            return userRepository.save(userData);
-        } else throw new CustomException("User with email " + email + " is Not Found");
-    }
+//    public UserData updateUserByEmail(String email, UserDTO userDTO) {
+//        if (userRepository.findByEmailId(email) != null) {
+//            int userID = userRepository.findByEmailId(email).getUserID();
+//            UserData userData = new UserData(userDTO);
+//            userData.setUserID(userID);
+//            return userRepository.save(userData);
+//        } else throw new CustomException("User with email " + email + " is Not Found");
+//    }
 
     //Ability to serve controller's user login records api call
     public String userLogin(String email, String password) {

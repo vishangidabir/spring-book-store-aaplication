@@ -17,7 +17,7 @@ public interface IUserService {
 
     UserData getRecordByToken(String token);
 
-    UserData updateUserByEmail(String email, UserDTO userDTO);
+//    UserData updateUserByEmail(String email, UserDTO userDTO);
 
     String userLogin(String email, String password);
 
