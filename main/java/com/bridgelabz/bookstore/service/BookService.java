@@ -95,7 +95,6 @@ public class BookService implements IBookService{
     }
 
     //Ability to serve to controller's update book quantity api call
-
     public Book updateQuantity(String token, int bookId, int quantity) {
         long userId = tokenUtility.decodeToken(token);
         userRepository.findById((int) userId).orElseThrow(() -> new CustomException("tokens do not match to the user"));
