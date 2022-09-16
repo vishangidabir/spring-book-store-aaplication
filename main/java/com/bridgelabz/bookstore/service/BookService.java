@@ -10,10 +10,11 @@ import com.bridgelabz.bookstore.repository.UserRepository;
 import com.bridgelabz.bookstore.utility.TokenUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
 
 @Service
-public class BookService implements IBookService{
+public class BookService implements IBookService {
 
     //Autowired BookRepository to inject its dependency here
     @Autowired
@@ -30,8 +31,8 @@ public class BookService implements IBookService{
         long userId = tokenUtility.decodeToken(token);
         UserData user = userRepository.findById((int) userId).orElseThrow(() -> new CustomException("tokens do not match the user"));
         if (user.isAdmin()) {
-            Book book =  bookRepository.save(new Book(bookDTO));
-            emailService.sendEmail(user.getEmail(), "new book added", "new book if id "+ book.getBookID()+" is added to book Store by "+ user.getFirstName()+" "+user.getLastName() +". \nBook Details:\n"+book.toJson());
+            Book book = bookRepository.save(new Book(bookDTO));
+            emailService.sendEmail(user.getEmail(), "new book added", "new book if id " + book.getBookID() + " is added to book Store by " + user.getFirstName() + " " + user.getLastName() + ". \nBook Details:\n" + book.toJson());
             return book;
         } else throw new CustomException("User is not an Admin");
     }
@@ -44,19 +45,19 @@ public class BookService implements IBookService{
     }
 
     //Ability to serve to controller's retrieving records by id api call
-    public Book getBookById(String token, int bookId) {
+    public Book getBookById(String token, int bookID) {
         long userId = tokenUtility.decodeToken(token);
         userRepository.findById((int) userId).orElseThrow(() -> new CustomException("tokens do not match the user"));
-        return bookRepository.findById(bookId).orElseThrow(() -> new CustomException("Books id " + bookId + " not found!"));
+        return bookRepository.findById(bookID).orElseThrow(() -> new CustomException("Books id " + bookID + " not found!"));
     }
 
     //Ability to serve to controller's update record by id api call
-    public Book updateBookById(String token, int bookId, BookDTO bookDTO) {
+    public Book updateBookById(String token, int bookID, BookDTO bookDTO) {
         long userId = tokenUtility.decodeToken(token);
         userRepository.findById((int) userId).orElseThrow(() -> new CustomException("tokens do not match the user"));
-        bookRepository.findById(bookId).orElseThrow(() -> new CustomException("Books id " + bookId + " not found!"));
+        bookRepository.findById(bookID).orElseThrow(() -> new CustomException("Books id " + bookID + " not found!"));
         Book book = new Book(bookDTO);
-        book.setBookId(bookId);
+        book.setBookID(bookID);
         return bookRepository.save(book);
     }
 
@@ -70,13 +71,13 @@ public class BookService implements IBookService{
     }
 
     //Ability to serve to controller's delete record by id api call
-    public String deleteBookById(String token, int bookId) {
+    public String deleteBookById(String token, int bookID) {
         long userId = tokenUtility.decodeToken(token);
         UserData user = userRepository.findById((int) userId).orElseThrow(() -> new CustomException("tokens do not match the user"));
-        bookRepository.findById(bookId).orElseThrow(() -> new CustomException("Books id " + bookId + " not found!"));
+        bookRepository.findById(bookID).orElseThrow(() -> new CustomException("Books id " + bookID + " not found!"));
         if (user.isAdmin()) {
-            bookRepository.deleteById(bookId);
-            return "Book id: " + bookId;
+            bookRepository.deleteById(bookID);
+            return "Book id: " + bookID;
         } else throw new CustomException("User is not Admin");
     }
 
@@ -95,11 +96,11 @@ public class BookService implements IBookService{
     }
 
     //Ability to serve to controller's update book quantity api call
-    public Book updateQuantity(String token, int bookId, int quantity) {
+    public Book updateQuantity(String token, int bookID, int quantity) {
         long userId = tokenUtility.decodeToken(token);
         userRepository.findById((int) userId).orElseThrow(() -> new CustomException("tokens do not match to the user"));
-        bookRepository.findById(bookId).orElseThrow(() -> new CustomException("Books id " + bookId + " not found!"));
-        Book book = bookRepository.findBookById(bookId);
+        bookRepository.findById(bookID).orElseThrow(() -> new CustomException("Books id " + bookID + " not found!"));
+        Book book = bookRepository.findBookById(bookID);
         book.setQuantity(quantity);
         return bookRepository.save(book);
     }

@@ -22,5 +22,4 @@ public interface IUserService {
     String userLogin(String email, String password);
 
     String changePassword(String email, String token, String newPassword);
-
 }

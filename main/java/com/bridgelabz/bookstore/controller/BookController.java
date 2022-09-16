@@ -20,7 +20,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/insert
      */
     @PostMapping("/insert")
-    public ResponseEntity<ResposeDTO> insertBook(@RequestHeader(name = "Authorization") String token, @RequestBody BookDTO bookDTO){
+    public ResponseEntity<ResposeDTO> insertBook(@RequestHeader(name = "Authorization") String token, @RequestBody BookDTO bookDTO) {
         ResposeDTO responseDTO = new ResposeDTO("Inserted new Book", bookService.insertBook(token, bookDTO));
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
@@ -31,7 +31,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/retrieveAllBooks
      */
     @GetMapping("/retrieveAllBooks")
-    public ResponseEntity<ResposeDTO> getAllBooks(){
+    public ResponseEntity<ResposeDTO> getAllBooks() {
         ResposeDTO responseDTO = new ResposeDTO("GET call Success", bookService.getAllBooks());
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -42,7 +42,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/sort/asce
      */
     @GetMapping("/sort/asce")
-    public ResponseEntity<ResposeDTO> sortBooksAscending(){
+    public ResponseEntity<ResposeDTO> sortBooksAscending() {
         ResposeDTO responseDTO = new ResposeDTO("GET call Success", bookService.sortBooksAscending());
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -53,7 +53,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/sort/desc
      */
     @GetMapping("/sort/desc")
-    public ResponseEntity<ResposeDTO> sortBooksDescending(){
+    public ResponseEntity<ResposeDTO> sortBooksDescending() {
         ResposeDTO responseDTO = new ResposeDTO("GET call Success", bookService.sortBooksDescending());
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -64,7 +64,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/retrieve/1
      */
     @GetMapping("/retrieve/{id}")
-    public ResponseEntity<ResposeDTO> getBookById(@RequestHeader(name = "Authorization") String token, @PathVariable int id){
+    public ResponseEntity<ResposeDTO> getBookById(@RequestHeader(name = "Authorization") String token, @PathVariable int id) {
         ResposeDTO responseDTO = new ResposeDTO("GET call Success", bookService.getBookById(token, id));
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -75,7 +75,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/retrieve
      */
     @GetMapping("/retrieve")
-    public ResponseEntity<ResposeDTO> searchBookByName(@RequestHeader(name = "Authorization") String token, @RequestParam String bookName){
+    public ResponseEntity<ResposeDTO> searchBookByName(@RequestHeader(name = "Authorization") String token, @RequestParam String bookName) {
         ResposeDTO responseDTO = new ResposeDTO("GET call Success", bookService.getBookByName(token, bookName));
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -86,7 +86,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/delete/1
      */
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ResposeDTO> deleteBookById(@RequestHeader(name = "Authorization") String token, @PathVariable int id){
+    public ResponseEntity<ResposeDTO> deleteBookById(@RequestHeader(name = "Authorization") String token, @PathVariable int id) {
         ResposeDTO responseDTO = new ResposeDTO("Book deleted", bookService.deleteBookById(token, id));
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -97,7 +97,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/update/1
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<ResposeDTO> updateBookById(@RequestHeader(name = "Authorization") String token, @PathVariable int id, @RequestBody BookDTO bookDTO){
+    public ResponseEntity<ResposeDTO> updateBookById(@RequestHeader(name = "Authorization") String token, @PathVariable int id, @RequestBody BookDTO bookDTO) {
         ResposeDTO responseDTO = new ResposeDTO("Book Updated", bookService.updateBookById(token, id, bookDTO));
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
@@ -108,7 +108,7 @@ public class BookController {
      * http://localhost:8080/bookdetails/updatequantity
      */
     @PutMapping("/updatequantity")
-    public ResponseEntity<ResposeDTO> updateQuantity(@RequestHeader(name = "Authorization") String token, @RequestParam int id, int quantity){
+    public ResponseEntity<ResposeDTO> updateQuantity(@RequestHeader(name = "Authorization") String token, @RequestParam int id, int quantity) {
         ResposeDTO responseDTO = new ResposeDTO("Book quantity updated", bookService.updateQuantity(token, id, quantity));
         return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }

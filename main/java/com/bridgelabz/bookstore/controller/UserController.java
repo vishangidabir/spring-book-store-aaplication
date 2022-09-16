@@ -104,5 +104,4 @@ public class UserController {
         ResposeDTO responseDTO = new ResposeDTO("User Registration Successful!", userService.changePassword(email, token, newPassword));
         return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
     }
-
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @Table(name = "cartDetails")
 public class Cart {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cartID;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

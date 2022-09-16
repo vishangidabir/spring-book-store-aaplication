@@ -6,21 +6,21 @@ import com.bridgelabz.bookstore.entity.Book;
 import java.util.List;
 
 public interface IBookService {
-    public Book insertBook(String token, BookDTO bookDTO);
+    Book insertBook(String token, BookDTO bookDTO);
 
-    public List<Book> getAllBooks();
+    List<Book> getAllBooks();
 
-    public Book getBookById(String token, int bookId);
+    Book getBookById(String token, int bookId);
 
-    public Book updateBookById(String token, int bookId, BookDTO bookDTO);
+    Book updateBookById(String token, int bookId, BookDTO bookDTO);
 
-    public List<Book> getBookByName(String token, String name);
+    List<Book> getBookByName(String token, String name);
 
-    public String deleteBookById(String token, int bookId);
+    String deleteBookById(String token, int bookId);
 
-    public List<Book> sortBooksAscending();
+    List<Book> sortBooksAscending();
 
-    public List<Book> sortBooksDescending();
+    List<Book> sortBooksDescending();
 
-    public Book updateQuantity(String token, int bookId, int quantity);
+    Book updateQuantity(String token, int bookId, int quantity);
 }

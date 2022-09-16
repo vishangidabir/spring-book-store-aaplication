@@ -6,9 +6,15 @@ import com.bridgelabz.bookstore.entity.Cart;
 import java.util.List;
 
 public interface ICartService {
-    public Cart addToCart(String token, CartDTO cartDTO);
+    Cart addToCart(String token, CartDTO cartDTO);
 
-    public List<Cart> getAllCartRecords();
+    List<Cart> getAllCarts(String token);
 
-    public Cart getCartRecord(long id);
+    Cart getCartById(String token, long id);
+
+    String deleteCartById(String token, long id);
+
+    Cart UpdateCart(String token, CartDTO cartDTO, long cartId);
+
+
 }

@@ -18,7 +18,7 @@ import javax.persistence.*;
 @Table(name = "book_Details")
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id", nullable = false)
 
     private int bookID;
@@ -38,9 +38,6 @@ public class Book {
         this.bookImg = dto.getBookImg();
     }
 
-
-    public void setBookId(int bookId) {
-    }
     public String toJson() {
         return  "bookId: " + bookID +
                 ", \nbookName: " + bookName +

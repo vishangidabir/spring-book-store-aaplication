@@ -1,7 +1,6 @@
 package com.bridgelabz.bookstore.service;
 
 import com.bridgelabz.bookstore.dto.CartDTO;
-import com.bridgelabz.bookstore.entity.Book;
 import com.bridgelabz.bookstore.entity.Cart;
 import com.bridgelabz.bookstore.entity.UserData;
 import com.bridgelabz.bookstore.exception.CustomException;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class CartService implements ICartService {
@@ -31,21 +29,21 @@ public class CartService implements ICartService {
         Cart cart;
         List<Integer> bookIdList = cartDTO.getBookIdList();
         List<Integer> quantityList = cartDTO.getQuantity();
-        long userId = tokenUtility.decodeToken(token);
-        UserData userData = userRepository.findById((int) userId).orElseThrow(() -> new CustomException("User id " + userId + " not found"));
+        long userID = tokenUtility.decodeToken(token);
+        UserData userData = userRepository.findById((int) userID).orElseThrow(() -> new CustomException("User id " + userID + " not found"));
 
         for (int i = 0; i < bookIdList.size(); i++) {
             if (quantityList.get(i) > bookRepository.findBookById(bookIdList.get(i)).getQuantity())
                 throw new CustomException("Book quantity exceeded for book id " + bookIdList.get(i));
         }
-        if (cartRepository.existsById(userId)) {
-            cart = cartRepository.findById(userId).orElseThrow(() -> new CustomException("User id " + userId + " not found"));
+        if (cartRepository.existsById(userID)) {
+            cart = cartRepository.findById(userID).orElseThrow(() -> new CustomException("User id " + userID + " not found"));
             cart.setUserData(userData);
             cart.setBookIdList(cartDTO.getBookIdList());
             cart.setQuantity(cartDTO.getQuantity());
             return cartRepository.save(cart);
         } else {
-            cart = new Cart(userId, userData, cartDTO.getBookIdList(), cartDTO.getQuantity());
+            cart = new Cart(userID, userData, cartDTO.getBookIdList(), cartDTO.getQuantity());
             try {
 
                 return cartRepository.save(cart);
@@ -57,24 +55,36 @@ public class CartService implements ICartService {
     }
 
     //Ability to serve to controller's retrieve all cart records api call
-    public List<Cart> getAllCartRecords() {
-        if (!cartRepository.findAll().isEmpty()) {
-            List<Cart> cartList = cartRepository.findAll();
-            return cartList;
-        } else throw new CustomException("Cart Table is Empty!");
-
+    public List<Cart> getAllCarts(String token) {
+        long userID = tokenUtility.decodeToken(token);
+        UserData user = userRepository.findById((int) userID).orElseThrow(() -> new CustomException("User id " + userID + " not found"));
+        if (!user.isAdmin()) throw new CustomException("User is not Admin");
+        if (cartRepository.findAll().isEmpty()) throw new CustomException("No cart added yet");
+        return cartRepository.findAll();
     }
 
+    public Cart getCartById(String token, long id) {
+        long userID = tokenUtility.decodeToken(token);
+        if (userID != id) throw new CustomException("Token is not matching with user id " + id);
+        UserData user = userRepository.findById((int) userID).orElseThrow(() -> new CustomException("User id " + userID + " not found"));
+        if (!user.isAdmin()) throw new CustomException("User is not Admin");
+        return cartRepository.findById(id).orElseThrow(() -> new CustomException("Cart og id " + userID + " not found"));
+    }
 
-    //Ability to serve to controller's retrieve cart record by id api call
-    public Cart getCartRecord(long id) {
-        Optional<Cart> cart = cartRepository.findById(id);
-        if (cart.isEmpty()) {
-            throw new CustomException("Cart Record doesn't exists");
-        } else {
-            System.out.println("Cart record retrieved successfully for id " + id);
-            return cart.get();
-        }
+    public String deleteCartById(String token, long id) {
+        long userID = tokenUtility.decodeToken(token);
+        if (userID != id) throw new CustomException("Token is not matching with user id " + id);
+        if (cartRepository.existsById(id)) {
+            cartRepository.deleteById(id);
+        } else throw new CustomException("cart not found of id " + id);
+        return "Cart deleted of id " + id;
+    }
+
+    public Cart UpdateCart(String token, CartDTO cartDTO, long cartId) {
+        long userID = tokenUtility.decodeToken(token);
+        if (userID == cartId) {
+            return addToCart(token, cartDTO);
+        } else throw new CustomException("cartId " + cartId + " not matching with token");
     }
 
 }

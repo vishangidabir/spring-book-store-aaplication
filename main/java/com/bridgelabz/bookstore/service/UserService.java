@@ -20,7 +20,6 @@ public class UserService implements IUserService {
 
     @Autowired
     EmailService emailService;
-
     @Autowired
     TokenUtility tokenUtility;
 
@@ -103,6 +102,7 @@ public class UserService implements IUserService {
             } else return "Incorrect token";
         } else throw new CustomException("User with email " + email + " is Not Found");
     }
+
 }
 
 

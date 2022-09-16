@@ -1,15 +1,8 @@
 package com.bridgelabz.bookstore.entity;
 
 import com.bridgelabz.bookstore.dto.UserDTO;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import lombok.*;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -19,9 +12,8 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 @Table(name = "usersDetails")
 public class UserData {
-
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userID;
     private String firstName;
     private String lastName;
@@ -30,8 +22,6 @@ public class UserData {
 
     private LocalDate dob;
     private String password;
-
-    private String token;
     private boolean isAdmin;
 
     private boolean isLogin;
@@ -44,7 +34,6 @@ public class UserData {
         this.address = userDTO.getAddress();
         this.dob = userDTO.getDob();
         this.password = userDTO.getPassword();
-        this.token = userDTO.getToken();
         this.isAdmin = userDTO.isAdmin();
         this.isLogin = userDTO.isLogin();
     }
@@ -57,7 +46,6 @@ public class UserData {
         this.address = userData.getAddress();
         this.dob = userData.getDob();
         this.password = userData.getPassword();
-        this.token = userData.getToken();
         this.isAdmin = userData.isAdmin();
         this.isLogin = userData.isLogin;
     }

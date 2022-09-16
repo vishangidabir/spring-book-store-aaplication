@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import javax.validation.constraints.Email;
 import java.time.LocalDate;
 
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,4 +25,5 @@ public class UserDTO {
     private String password;
     private boolean isAdmin;
     private boolean login;
+
 }
