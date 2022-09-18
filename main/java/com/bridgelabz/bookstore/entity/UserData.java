@@ -1,7 +1,11 @@
 package com.bridgelabz.bookstore.entity;
 
 import com.bridgelabz.bookstore.dto.UserDTO;
-import lombok.*;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
+
 import javax.persistence.*;
 import java.time.LocalDate;
 
@@ -19,13 +23,10 @@ public class UserData {
     private String lastName;
     private String email;
     private String address;
-
     private LocalDate dob;
     private String password;
     private boolean isAdmin;
-
     private boolean isLogin;
-
 
     public UserData(UserDTO userDTO) {
         this.firstName = userDTO.getFirstName();

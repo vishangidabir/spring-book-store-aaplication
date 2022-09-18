@@ -11,10 +11,9 @@ public interface IBookService {
     List<Book> getAllBooks();
 
     Book getBookById(String token, int bookId);
-
-    Book updateBookById(String token, int bookId, BookDTO bookDTO);
-
     List<Book> getBookByName(String token, String name);
+
+    public Book updateBookById(String token, int bookID, BookDTO bookDTO);
 
     String deleteBookById(String token, int bookId);
 

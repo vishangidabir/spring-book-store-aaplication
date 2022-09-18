@@ -8,8 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-
 @RestController
 @RequestMapping("/orderdetails")
 public class OrderController {
@@ -18,11 +16,10 @@ public class OrderController {
     IOrderService orderService;
 
     /**
-     * Inserted order details to database
+     * Retrieve all order details to database
      * this is POST call
      * http://localhost:8080/orderdetails/insert
      */
-    //Ability to call api to insert order record
     @PostMapping("/insert")
     public ResponseEntity<ResposeDTO> placeOrder(@RequestHeader(name = "Authorization") String token, @RequestBody OrderDTO orderDTO) {
         ResposeDTO responseDTO = new ResposeDTO("Order Placed Successfully", orderService.insertOrder(token, orderDTO));
@@ -35,9 +32,9 @@ public class OrderController {
      * http://localhost:8080/orderdetails/retrieveAllOrders
      */
     @GetMapping("/retrieveAllOrders")
-    public ResponseEntity<ResposeDTO> getAllOrderRecords() {
-        ResposeDTO dto = new ResposeDTO("All records retrieved successfully !", orderService.getAllOrderRecords());
-        return new ResponseEntity(dto, HttpStatus.OK);
+    public ResponseEntity<ResposeDTO> getAllOrders(@RequestHeader(name = "Authorization") String token) {
+        ResposeDTO responseDTO = new ResposeDTO("GET Call Success", orderService.getAllOrderRecords(token));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /**
@@ -46,9 +43,20 @@ public class OrderController {
      * http://localhost:8080/orderdetails/retrieveOrder/1
      */
     @GetMapping("/retrieveOrder/{id}")
-    public ResponseEntity<ResposeDTO> getBookRecord(@PathVariable Integer id) {
-        ResposeDTO dto = new ResposeDTO("Record retrieved successfully !", orderService.getOrderRecord(id));
-        return new ResponseEntity(dto, HttpStatus.OK);
+    public ResponseEntity<ResposeDTO> getOrderById(@RequestHeader(name = "Authorization") String token, @PathVariable long orderId) {
+        ResposeDTO responseDTO = new ResposeDTO("GET Call Success", orderService.getOrderRecord(token, orderId));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    }
+
+    /**
+     * Delete order details by id to database
+     * this is DELETE call
+     * http://localhost:8080/orderdetails/deleteOrder/1
+     */
+    @DeleteMapping("deleteOrder/{id}")
+    public ResponseEntity<ResposeDTO> deleteOrderById(@RequestHeader(name = "Authorization") String token, @PathVariable long orderId) {
+        ResposeDTO responseDTO = new ResposeDTO("GET Call Success", orderService.deleteOrderById(token, orderId));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
     /**
@@ -56,10 +64,10 @@ public class OrderController {
      * this is PUT call
      * http://localhost:8080/orderdetails/updateOrder/1
      */
-    @PutMapping("/updateOrder/{id}")
-    public ResponseEntity<ResposeDTO> updateBookRecord(@PathVariable Integer id, @Valid @RequestBody OrderDTO orderdto) {
-        ResposeDTO dto = new ResposeDTO("Record updated successfully !", orderService.updateOrderRecord(id, orderdto));
-        return new ResponseEntity(dto, HttpStatus.ACCEPTED);
+    @PutMapping("/updateOrder/{orderId}")
+    public ResponseEntity<ResposeDTO> updateOrderById(@RequestHeader(name = "Authorization") String token, @PathVariable long orderId, @RequestBody OrderDTO orderDTO) {
+        ResposeDTO responseDTO = new ResposeDTO("GET Call Success", orderService.updateOrderById(token, orderId, orderDTO));
+        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
     }
 
 }

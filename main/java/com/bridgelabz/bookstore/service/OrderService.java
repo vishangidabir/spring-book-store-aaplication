@@ -7,14 +7,15 @@ import com.bridgelabz.bookstore.entity.Order;
 import com.bridgelabz.bookstore.entity.UserData;
 import com.bridgelabz.bookstore.exception.CustomException;
 import com.bridgelabz.bookstore.repository.BookRepository;
+import com.bridgelabz.bookstore.repository.CartRepository;
 import com.bridgelabz.bookstore.repository.OrderRepository;
 import com.bridgelabz.bookstore.repository.UserRepository;
 import com.bridgelabz.bookstore.utility.TokenUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrderService implements IOrderService {
@@ -28,78 +29,95 @@ public class OrderService implements IOrderService {
     @Autowired
     TokenUtility tokenUtility;
     @Autowired
-    private OrderRepository orderRepository;
+    CartRepository cartRepository;
     @Autowired
-    private BookRepository bookRepository;
+    OrderRepository orderRepository;
     @Autowired
-    private UserRepository userRepository;
+    BookRepository bookRepository;
+    @Autowired
+    UserRepository userRepository;
 
     //Ability to serve controller's insert order record api call
-    public Order insertOrder(String token, OrderDTO orderdto) {
+    public Order insertOrder(String token, OrderDTO orderDTO) {
+        List<Long> bookIdList = orderDTO.getBookIdList();
+        List<Long> quantityList = orderDTO.getQuantityList();
         long userId = tokenUtility.decodeToken(token);
-        Optional<Book> book = bookRepository.findById(orderdto.getBookID());
-        Optional<UserData> user = userRepository.findById(orderdto.getUserID());
-        if (book.isPresent() && user.isPresent()) {
-            if (orderdto.getQuantity() <= book.get().getQuantity()) {
-                Order newOrder = new Order(book.get().getPrice(), orderdto.getQuantity(), orderdto.getAddress(), book.get(), user.get(), orderdto.isCancel());
-                orderRepository.save(newOrder);
-                book.get().setQuantity(book.get().getQuantity() - orderdto.getQuantity());
-                book.get().setPrice(book.get().getPrice() - orderdto.getPrice());
-                bookRepository.save(book.get());
-                System.out.println("Order record inserted successfully");
-                emailService.sendEmail(orderdto.getEmail(), "Your Order Placed successfully", "Hello, Your order for " + newOrder + "  is placed successfully on " + newOrder.getDate() + " and will be delivered to you shortly.");
-                return newOrder;
-            } else {
-                throw new CustomException("Requested quantity is not available");
-            }
-        } else {
-            throw new CustomException("Book or User doesn't exists");
-        }
-    }
-
-    //Ability to serve controller's retrieve all order records api call
-    public List<Order> getAllOrderRecords() {
-        if (!orderRepository.findAll().isEmpty()) {
-            return orderRepository.findAll();
-        } else throw new CustomException("Books Table is Empty!");
-    }
-
-    //Ability to serve controller's retrieve order record by id api call
-    public Order getOrderRecord(Integer id) {
-        Optional<Order> order = orderRepository.findById(id);
-        if (order.isEmpty()) {
-            throw new CustomException("Order Record doesn't exists");
-        } else {
-            System.out.println("Order record retrieved successfully for id " + id);
-            return order.get();
-        }
-    }
-
-    //Ability to serve controller's update order record by id api call
-    public Order updateOrderRecord(Integer id, OrderDTO dto) {
-        Optional<Order> order = orderRepository.findById(id);
-        Optional<Book> book = bookRepository.findById(dto.getBookID());
-        Optional<UserData> user = userRepository.findById(dto.getUserID());
-        if (order.isEmpty()) {
-            throw new CustomException("Order Record doesn't exists");
-        } else {
-            if (book.isPresent() && user.isPresent()) {
-                if (dto.getQuantity() <= book.get().getQuantity()) {
-                    Order newOrder = new Order(id, book.get().getPrice(), dto.getQuantity(), dto.getAddress(), book.get(), user.get(), dto.isCancel());
-                    orderRepository.save(newOrder);
-                    System.out.println("Order record updated successfully for id " + id);
-                    book.get().setQuantity(book.get().getQuantity() - (dto.getQuantity() - order.get().getQuantity()));
-                    bookRepository.save(book.get());
-                    return newOrder;
-                } else {
-                    throw new CustomException("Requested quantity is not available");
-                }
-            } else {
-                throw new CustomException("Book or User doesn't exists");
-
+        UserData user = userService.getRecord((int) userId).orElseThrow(() -> new CustomException("User id " + userId + " Not found!"));
+        double totalPrice = 0;
+        for (int i = 0; i < orderDTO.getBookIdList().size(); i++) {
+            Book book = bookRepository.findBookById(bookIdList.get(i));
+            if (quantityList.get(i) > book.getQuantity())
+                throw new CustomException("Book quantity exceeded for book id " + bookIdList.get(i));
+            else {
+                totalPrice += book.getPrice() * quantityList.get(i);
             }
         }
+        LocalDate purchaseDate = LocalDate.now();
+        Order order = new Order(user, user.getAddress(), bookIdList, orderDTO.getQuantityList(), totalPrice, purchaseDate);
+        Order newOrder = orderRepository.save(order);
+        for (int i = 0; i < bookIdList.size(); i++) {
+            long bookId = bookIdList.get(i);
+            long orderQuantity = quantityList.get(i);
+            Book book = bookRepository.findById((int) bookId).orElseThrow();
+            bookService.updateQuantity(token, book.getBookID(), (int) (book.getQuantity() - orderQuantity));
+        }
+        emailService.sendEmail(user.getEmail(), "new Order Placed on BookSore", "Hello " + user.getFirstName() + user.getLastName() + ", Yous order of book id's " + bookIdList + " is placed successfully.");
+        return newOrder;
     }
 
+    //Ability to serve controller's Retrieve all record api call
+    public List<Order> getAllOrderRecords(String token) {
+        long userId = tokenUtility.decodeToken(token);
+        UserData user = userService.getRecord((int) userId).orElseThrow(() -> new CustomException("User id " + userId + " Not found!"));
+        if (!user.isAdmin()) throw new CustomException("User is not Admin");
+        if (orderRepository.findAll().isEmpty()) throw new CustomException("User table is empty");
+        else return orderRepository.findAll();
+    }
 
+    //Ability to serve controller's Retrieve record by id api call
+    public Order getOrderRecord(String token, long orderId) {
+        long userId = tokenUtility.decodeToken(token);
+        return orderRepository.findById((int) orderId).orElseThrow(() -> new CustomException("order id " + orderId + " not found"));
+    }
+
+    //Ability to serve controller's Delete record by id api call
+    public String deleteOrderById(String token, long orderId) {
+        long userId = tokenUtility.decodeToken(token);
+        UserData user = userService.getRecord((int) userId).orElseThrow(() -> new CustomException("User id " + userId + " Not found!"));
+        orderRepository.deleteById((int) orderId);
+        return "deleted order of id " + orderId + " by " + user.getFirstName();
+    }
+
+    //Ability to serve controller's Update record by api call
+    public Order updateOrderById(String token, long orderId, OrderDTO orderDTO) {
+        List<Long> bookIdList = orderDTO.getBookIdList();
+        List<Long> quantityList = orderDTO.getQuantityList();
+        long userId = tokenUtility.decodeToken(token);
+        LocalDate purchaseDate = LocalDate.now();
+        UserData user = userService.getRecord((int) userId).orElseThrow(() -> new CustomException("User of userId " + userId + " Not found!"));
+        Order order = orderRepository.findById((int) orderId).orElseThrow(() -> new CustomException("Order od userId " + orderId + " Not found!"));
+        double price = 0;
+        for (int i = 0; i < orderDTO.getBookIdList().size(); i++) {
+            Book book = bookRepository.findBookById(bookIdList.get(i));
+            if (quantityList.get(i) > book.getQuantity())
+                throw new CustomException("Book quantity exceeded for book id " + bookIdList.get(i));
+            else {
+                price += book.getPrice() * quantityList.get(i);
+            }
+        }
+        order.setBookIdList(orderDTO.getBookIdList());
+        order.setPrice(price);
+        order.setPurchaseDate(purchaseDate);
+        order.setUser(user);
+        order.setAddress(user.getAddress());
+        order.setQuantities(orderDTO.getQuantityList());
+        Order updatedOrder = orderRepository.save(order);
+        emailService.sendEmail(user.getEmail(), "Order updated on BookSore", "Hello " + user.getFirstName() + user.getLastName() + ", Yous order of book id " + orderDTO.getBookIdList() + " is updated successfully.");
+        return updatedOrder;
+    }
 }
+
+
+
+
+

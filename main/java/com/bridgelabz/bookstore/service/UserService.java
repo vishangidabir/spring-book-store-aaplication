@@ -48,11 +48,11 @@ public class UserService implements IUserService {
 
     //Ability to serve controller's retrieve  user records by email api call
     public UserData getUserByEmailId(String email) {
-        Optional<UserData> userData = userRepository.findByMail(email);
+        List<UserData> userData = userRepository.findByEmail(email);
         if (userData.isEmpty()) {
             throw new CustomException("User record does not exist");
         } else {
-            return userData.get();
+            return userData.get(Integer.parseInt(email));
         }
     }
 
@@ -79,21 +79,22 @@ public class UserService implements IUserService {
 
     //Ability to serve controller's user login records api call
     public String userLogin(String email, String password) {
-        if (userRepository.findByEmailId(email) != null) {
-            UserData userData = (UserData) userRepository.findByEmailId(email);
+        if (userRepository.findByEmail(email) != null) {
+            UserData userData = (UserData) userRepository.findByEmail(email);
             if (userData.getPassword().equals(password)) {
                 userData.setLogin(true);
                 String token = tokenUtility.createToken(userData.getUserID());
                 userRepository.save(userData);
                 return "Login SuccessFull! token = " + token;
             } else return "Incorrect password";
-        } else throw new CustomException("User with email " + email + " is Not Found");
+        } else
+            throw new CustomException("User with email " + email + " is Not Found");
     }
 
     //Ability to serve controller's change password records api call
     public String changePassword(String email, String token, String newPassword) {
-        if (userRepository.findByEmailId(email) != null) {
-            UserData userData = (UserData) userRepository.findByEmailId(email);
+        if (userRepository.findByEmail(email) != null) {
+            UserData userData = (UserData) userRepository.findByEmail(email);
             long id = tokenUtility.decodeToken(token);
             if (userData.getUserID() == (id)) {
                 userData.setPassword(newPassword);
